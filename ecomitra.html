@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoMitra Pro - Advanced Carbon Footprint Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 EcoMitra Pro - Advanced Carbon Intelligence</h1>
+            <p>AI-Powered Carbon Footprint Analysis for Sustainable India 🇮🇳</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('calculator')">🧮 Calculator</button>
+            <button class="nav-tab" onclick="switchTab('tracker')">📊 Tracker</button>
+            <button class="nav-tab" onclick="switchTab('insights')">🔍 Insights</button>
+            <button class="nav-tab" onclick="switchTab('methodology')">📚 Methodology</button>
+        </div>
+
+        <!-- Calculator Tab -->
+        <div id="calculator" class="tab-content active">
+            <div class="main-content">
+                <div class="input-section">
+                    <h2 class="section-title">📊 Carbon Footprint Assessment</h2>
+                    
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label>
+                                💡 Monthly Electricity Usage (kWh)
+                                <span class="info-icon" onclick="showTooltip(this, 'Based on your electricity bill. Average Indian household uses 90-300 kWh/month')">ℹ️</span>
+                            </label>
+                            <input type="number" id="electricity" placeholder="e.g., 250" min="0" step="10">
+                            <div class="input-tooltip"></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                🏠 Your State/Region
+                                <span class="info-icon" onclick="showTooltip(this, 'Different states have different electricity emission factors based on their energy mix')">ℹ️</span>
+                            </label>
+                            <select id="state">
+                                <option value="national">National Average</option>
+                                <option value="delhi">Delhi</option>
+                                <option value="maharashtra">Maharashtra</option>
+                                <option value="karnataka">Karnataka</option>
+                                <option value="tamil-nadu">Tamil Nadu</option>
+                                <option value="gujarat">Gujarat</option>
+                                <option value="rajasthan">Rajasthan</option>
+                                <option value="west-bengal">West Bengal</option>
+                                <option value="andhra-pradesh">Andhra Pradesh</option>
+                                <option value="telangana">Telangana</option>
+                                <option value="punjab">Punjab</option>
+                                <option value="haryana">Haryana</option>
+                                <option value="kerala">Kerala</option>
+                                <option value="odisha">Odisha</option>
+                                <option value="jharkhand">Jharkhand</option>
+                                <option value="assam">Assam</option>
+                                <option value="bihar">Bihar</option>
+                                <option value="chhattisgarh">Chhattisgarh</option>
+                                <option value="uttarakhand">Uttarakhand</option>
+                                <option value="himachal-pradesh">Himachal Pradesh</option>
+                                <option value="goa">Goa</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                🚗 Monthly Distance Traveled (km)
+                                <span class="info-icon" onclick="showTooltip(this, 'Total distance by all modes of transport. Include daily commute, shopping, leisure trips')">ℹ️</span>
+                            </label>
+                            <input type="number" id="distance" placeholder="e.g., 800" min="0" step="50">
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                🚙 Primary Vehicle Type
+                                <span class="info-icon" onclick="showTooltip(this, 'Your main mode of transportation. Emission factors vary significantly by vehicle type')">ℹ️</span>
+                            </label>
+                            <select id="vehicle-type">
+                                <option value="petrol-car">Petrol Car</option>
+                                <option value="diesel-car">Diesel Car</option>
+                                <option value="cng-car">CNG Car</option>
+                                <option value="hybrid-car">Hybrid Car</option>
+                                <option value="electric-car">Electric Car</option>
+                                <option value="motorcycle-petrol">Motorcycle (Petrol)</option>
+                                <option value="motorcycle-electric">Motorcycle (Electric)</option>
+                                <option value="auto-rickshaw">Auto Rickshaw</option>
+                                <option value="bus">Public Bus</option>
+                                <option value="metro">Metro/Local Train</option>
+                                <option value="bicycle">Bicycle</option>
+                                <option value="walking">Walking</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                🗑️ Monthly Waste Generated (kg)
+                                <span class="info-icon" onclick="showTooltip(this, 'Household waste including food scraps, packaging, paper. Average Indian household: 15-25 kg/month')">ℹ️</span>
+                            </label>
+                            <input type="number" id="waste" placeholder="e.g., 20" min="0" step="5">
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                💧 Daily Water Usage (liters)
+                                <span class="info-icon" onclick="showTooltip(this, 'Total household water consumption. Include drinking, cooking, bathing, cleaning. WHO recommends 50-100L per person per day')">ℹ️</span>
+                            </label>
+                            <input type="number" id="water" placeholder="e.g., 200" min="0" step="25">
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                🍽️ Food Preference
+                                <span class="info-icon" onclick="showTooltip(this, 'Diet significantly impacts carbon footprint. Meat production generates more emissions than plant-based foods')">ℹ️</span>
+                            </label>
+                            <select id="food-type">
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="lacto-vegetarian">Lacto-Vegetarian (includes dairy)</option>
+                                <option value="eggetarian">Eggetarian</option>
+                                <option value="pescatarian">Pescatarian (fish only)</option>
+                                <option value="mixed">Mixed Diet</option>
+                                <option value="heavy-meat">Heavy Meat Consumer</option>
+                                <option value="vegan">Vegan</option>
+                            </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label>
+                                👥 Household Size
+                                <span class="info-icon" onclick="showTooltip(this, 'Number of people in your household. Affects per-capita calculations and shared resource usage')">ℹ️</span>
+                            </label>
+                            <input type="number" id="household-size" placeholder="e.g., 4" min="1" max="10" value="4">
+                        </div>
+                    </div>
+
+                    <div class="advanced-options">
+                        <button class="advanced-toggle" onclick="toggleAdvanced()">
+                            🔧 Advanced Options <span id="advanced-arrow">▼</span>
+                        </button>
+                        <div class="advanced-content" id="advanced-content">
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label>
+                                        ✈️ Annual Air Travel (km)
+                                        <span class="info-icon" onclick="showTooltip(this, 'Domestic and international flights. Aviation has high per-km emissions due to high-altitude impact')">ℹ️</span>
+                                    </label>
+                                    <input type="number" id="air-travel" placeholder="e.g., 2000" min="0" step="100">
+                                </div>
+
+                                <div class="input-group">
+                                    <label>
+                                        🏠 Home Heating/Cooling
+                                        <span class="info-icon" onclick="showTooltip(this, 'AC, heaters, and other climate control systems consume significant energy')">ℹ️</span>
+                                    </label>
+                                    <select id="heating-cooling">
+                                        <option value="minimal">Minimal (fans only)</option>
+                                        <option value="moderate">Moderate AC usage</option>
+                                        <option value="heavy">Heavy AC usage</option>
+                                        <option value="central">Central AC/Heating</option>
+                                    </select>
+                                </div>
+
+                                <div class="input-group">
+                                    <label>
+                                        🛒 Monthly Shopping (₹)
+                                        <span class="info-icon" onclick="showTooltip(this, 'Includes clothing, electronics, household items. Manufacturing and shipping have embedded carbon costs')">ℹ️</span>
+                                    </label>
+                                    <input type="number" id="shopping" placeholder="e.g., 5000" min="0" step="500">
+                                </div>
+
+                                <div class="input-group">
+                                    <label>
+                                        🌱 Green Energy Usage (%)
+                                        <span class="info-icon" onclick="showTooltip(this, 'Percentage of electricity from renewable sources (solar panels, green energy plans)')">ℹ️</span>
+                                    </label>
+                                    <input type="range" id="green-energy" min="0" max="100" value="0" oninput="updateSliderValue('green-energy', 'green-energy-value')">
+                                    <div style="text-align: center; margin-top: 5px;">
+                                        <span id="green-energy-value">0</span>%
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label>
+                                        ♻️ Recycling Habits
+                                        <span class="info-icon" onclick="showTooltip(this, 'How much of your waste do you recycle? Recycling reduces emissions from waste processing')">ℹ️</span>
+                                    </label>
+                                    <select id="recycling">
+                                        <option value="none">No recycling</option>
+                                        <option value="minimal">Minimal (paper only)</option>
+                                        <option value="moderate">Moderate (paper, plastic)</option>
+                                        <option value="extensive">Extensive (most materials)</option>
+                                        <option value="comprehensive">Comprehensive + composting</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculateAdvancedCarbon()">
+                        🧮 Calculate Advanced Carbon Footprint
+                    </button>
+                </div>
+
+                <div class="results-section">
+                    <h2 class="section-title">📈 Your Carbon Analysis</h2>
+                    
+                    <div id="results" style="display: none;">
+                        <div class="results-card">
+                            <h3>Your Annual Carbon Footprint</h3>
+                            <div class="carbon-value" id="total-carbon">0</div>
+                            <p>kg CO₂ equivalent per year</p>
+                            <div class="comparison-text" id="comparison-text"></div>
+                        </div>
+
+                        <div class="trees-needed">
+                            <h3>🌳 Carbon Offset Requirements</h3>
+                            <div class="tree-count" id="trees-count">0</div>
+                            <p>trees needed to offset annually</p>
+                            <p style="font-size: 0.9rem; opacity: 0.9;">Or ₹<span id="offset-cost">0</span> for verified carbon credits</p>
+                        </div>
+
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <p style="text-align: center; margin: 10px 0; font-weight: bold;">
+                                <span id="carbon-level">Calculating...</span>
+                            </p>
+                        </div>
+
+                        <div class="impact-comparison">
+                            <div class="impact-item">
+                                <div class="impact-emoji">🏠</div>
+                                <h4>vs Average Indian</h4>
+                                <div id="india-comparison">Calculating...</div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-emoji">🌍</div>
+                                <h4>vs Global Average</h4>
+                                <div id="global-comparison">Calculating...</div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-emoji">🎯</div>
+                                <h4>vs Paris Target</h4>
+                                <div id="paris-comparison">Calculating...</div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <h3>📊 Emission Breakdown</h3>
+                            <div class="breakdown">
+                                <div class="breakdown-item">
+                                    <h4>⚡ Electricity</h4>
+                                    <div class="breakdown-value" id="electricity-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="electricity-percent">0%</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <h4>🚗 Transport</h4>
+                                    <div class="breakdown-value" id="transport-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="transport-percent">0%</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <h4>🍽️ Food</h4>
+                                    <div class="breakdown-value" id="food-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="food-percent">0%</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <h4>🗑️ Waste</h4>
+                                    <div class="breakdown-value" id="waste-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="waste-percent">0%</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <h4>💧 Water</h4>
+                                    <div class="breakdown-value" id="water-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="water-percent">0%</div>
+                                </div>
+                                <div class="breakdown-item">
+                                    <h4>✈️ Travel</h4>
+                                    <div class="breakdown-value" id="travel-carbon">0 kg</div>
+                                    <div class="breakdown-percentage" id="travel-percent">0%</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tips">
+                            <h3>🌱 Personalized Recommendations</h3>
+                            <ul id="tips-list">
+                                <li>Loading personalized recommendations...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tracker Tab -->
+        <div id="tracker" class="tab-content">
+            <div class="main-content">
+                <div style="padding: 40px; width: 100%;">
+                    <h2 class="section-title">📊 Carbon Footprint Tracker</h2>
+                    <div class="tracking-history">
+                        <h3>🗓️ Your Carbon History</h3>
+                        <div id="history-list">
+                            <p style="text-align: center; color: #666; padding: 20px;">
+                                No tracking history yet. Calculate your footprint to start tracking!
+                            </p>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button onclick="clearHistory()" style="background: #FF6B6B; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
+                                🗑️ Clear History
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Insights Tab -->
+        <div id="insights" class="tab-content">
+            <div class="main-content">
+                <div style="padding: 40px; width: 100%;">
+                    <h2 class="section-title">🔍 Carbon Insights & Analytics</h2>
+                    
+                    <div class="chart-container">
+                        <h3>📈 Indian Carbon Context</h3>
+                        <div class="breakdown">
+                            <div class="breakdown-item">
+                                <h4>🏭 India's Total Emissions</h4>
+                                <div class="breakdown-value">2.88 Gt</div>
+                                <div class="breakdown-percentage">CO₂ annually (3rd globally)</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <h4>👤 Per Capita Average</h4>
+                                <div class="breakdown-value">1.91 tons</div>
+                                <div class="breakdown-percentage">CO₂ per person/year</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <h4>🎯 Paris Agreement Target</h4>
+                                <div class="breakdown-value">2.3 tons</div>
+                                <div class="breakdown-percentage">CO₂ per person by 2030</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <h4>🌍 Global Average</h4>
+                                <div class="breakdown-value">4.8 tons</div>
+                                <div class="breakdown-percentage">CO₂ per person/year</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tips" style="margin-top: 30px;">
+                        <h3>🇮🇳 India's Climate Action</h3>
+                        <ul>
+                            <li>🌞 India has 70+ GW of renewable energy capacity (4th globally)</li>
+                            <li>🚂 Indian Railways is working towards net-zero emissions by 2030</li>
+                            <li>🌳 India aims to create additional carbon sink of 2.5-3 billion tonnes CO₂</li>
+                            <li>⚡ Target: 50% electricity from renewables by 2030</li>
+                            <li>🏭 India's emission intensity decreased by 33% between 2005-2019</li>
+                            <li>🌱 The country has increased forest cover by 16,000 km² since 2017</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Methodology Tab -->
+        <div id="methodology" class="tab-content">
+            <div class="main-content">
+                <div style="padding: 40px; width: 100%;">
+                    <h2 class="section-title">📚 Calculation Methodology</h2>
+                    
+                    <div class="methodology-section">
+                        <h3>⚡ Electricity Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Formula:</strong> Monthly kWh × State Emission Factor × 12<br>
+                            <strong>Emission Factors (kg CO₂/kWh):</strong><br>
+                            • National Average: 0.82<br>
+                            • Coal-heavy states (Jharkhand, Chhattisgarh): 0.95-1.1<br>
+                            • Renewable-rich states (Kerala, Karnataka): 0.6-0.75<br>
+                            • Delhi: 0.71 (due to gas plants)<br>
+                            <strong>Source:</strong> Central Electricity Authority (CEA), India
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>🚗 Transportation Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Formula:</strong> Monthly km × Vehicle Emission Factor × 12<br>
+                            <strong>Emission Factors (kg CO₂/km):</strong><br>
+                            • Petrol Car: 0.21 | Diesel Car: 0.19<br>
+                            • CNG Car: 0.16 | Hybrid: 0.15<br>
+                            • Electric Car: 0.05 (grid-based)<br>
+                            • Motorcycle (Petrol): 0.084<br>
+                            • Bus: 0.08/person | Metro: 0.03/person<br>
+                            <strong>Source:</strong> IPCC Guidelines, Ministry of Road Transport India
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>🍽️ Food Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Annual Emissions by Diet (kg CO₂):</strong><br>
+                            • Vegan: 1,200 | Vegetarian: 1,500<br>
+                            • Lacto-Vegetarian: 1,800 | Eggetarian: 2,000<br>
+                            • Pescatarian: 2,300 | Mixed Diet: 2,800<br>
+                            • Heavy Meat: 3,500+<br>
+                            <strong>Source:</strong> FAO, Climate Change and Food Systems Report
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>🗑️ Waste Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Formula:</strong> Monthly kg × Waste Factor × 12 × Recycling Multiplier<br>
+                            <strong>Emission Factor:</strong> 0.5 kg CO₂/kg waste<br>
+                            <strong>Recycling Multipliers:</strong><br>
+                            • None: 1.0 | Minimal: 0.9<br>
+                            • Moderate: 0.7 | Extensive: 0.5<br>
+                            • Comprehensive: 0.3<br>
+                            <strong>Source:</strong> CPCB, Waste Management Rules 2016
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>💧 Water Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Formula:</strong> Daily L × 0.0003 kg CO₂/L × 365<br>
+                            <strong>Includes:</strong> Water treatment, pumping, distribution<br>
+                            <strong>Source:</strong> Water Footprint Network, ISI Standards
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>✈️ Aviation Emissions</h3>
+                        <div class="formula-box">
+                            <strong>Formula:</strong> Annual km × 0.25 kg CO₂/km (includes high-altitude impact)<br>
+                            <strong>Multiplier:</strong> 2.7 (for radiative forcing at altitude)<br>
+                            <strong>Source:</strong> ICAO Carbon Calculator, IPCC Aviation Report
+                        </div>
+                    </div>
+
+                    <div class="methodology-section">
+                        <h3>🌳 Carbon Offset Calculations</h3>
+                        <div class="formula-box">
+                            <strong>Trees Required:</strong> Total CO₂ ÷ 21 kg CO₂/tree/year<br>
+                            <strong>Tree Species:</strong> Mixed Indian species average<br>
+                            • Neem: 25 kg/year | Banyan: 30 kg/year<br>
+                            • Peepal: 28 kg/year | Mango: 22 kg/year<br>
+                            <strong>Carbon Credit Cost:</strong> ₹400-800 per tonne CO₂<br>
+                            <strong>Source:</strong> Forest Research Institute, Dehradun
+                        </div>
+                    </div>
+
+                    <div class="tips">
+                        <h3>🎯 Accuracy & Limitations</h3>
+                        <ul>
+                            <li>📊 Calculations based on latest IPCC AR6 methodologies</li>
+                            <li>🇮🇳 Emission factors customized for Indian conditions</li>
+                            <li>⚠️ Results are estimates; actual emissions may vary ±15%</li>
+                            <li>🔄 Data updated annually from government sources</li>
+                            <li>🏠 Household size considered for per-capita calculations</li>
+                            <li>📍 Regional variations accounted for electricity emissions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Modal -->
+    <div id="info-modal" class="info-modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeInfoModal()">&times;</span>
+            <h2 id="modal-title">Calculation Information</h2>
+            <div id="modal-body">
+                Loading information...
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+    
