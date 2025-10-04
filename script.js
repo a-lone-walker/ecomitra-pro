@@ -537,11 +537,12 @@ function updateResults(data) {
     const globalAverage = 4800;
     const parisTarget = 2300;
 
-    const updateComparison = (id, average, label) => {
-        const element = document.getElementById(id);
-        if (element) {
+    const updateComparison = (valueId, descriptionId, average, label) => {
+        const valueElement = document.getElementById(valueId);
+        const descriptionElement = document.getElementById(descriptionId);
+        
+        if (valueElement && descriptionElement) {
             const percentage = (totalCarbon / average * 100);
-            const isAbove = totalCarbon > average;
             
             let description = '';
             if (percentage <= 80) description = 'Well below target';
@@ -549,15 +550,11 @@ function updateResults(data) {
             else if (percentage <= 120) description = 'Slightly above';
             else description = 'Above target';
             
-            element.innerHTML = `
-                <span class="impact-emoji-enhanced">${getComparisonEmoji(percentage)}</span>
-                <div class="impact-title-enhanced">${label}</div>
-                <div class="impact-value-enhanced">${percentage.toFixed(0)}%</div>
-                <div class="impact-description-enhanced">${description}</div>
-            `;
+            valueElement.textContent = percentage.toFixed(0) + '%';
+            descriptionElement.textContent = description;
             
-            // Add status class
-            const item = element.closest('.impact-item-enhanced');
+            // Update status class
+            const item = valueElement.closest('.impact-item-enhanced');
             if (item) {
                 item.classList.remove('status-good', 'status-warning', 'status-bad');
                 if (percentage <= 80) item.classList.add('status-good');
@@ -568,9 +565,9 @@ function updateResults(data) {
         }
     };
 
-    updateComparison('india-comparison', indianAverage, 'vs Indian Average');
-    updateComparison('global-comparison', globalAverage, 'vs Global Average');
-    updateComparison('paris-comparison', parisTarget, 'vs Paris Target');
+    updateComparison('india-comparison', 'india-description', indianAverage, 'vs Indian Average');
+    updateComparison('global-comparison', 'global-description', globalAverage, 'vs Global Average');
+    updateComparison('paris-comparison', 'paris-description', parisTarget, 'vs Paris Target');
 
     // Animate progress bar
     setTimeout(() => {
