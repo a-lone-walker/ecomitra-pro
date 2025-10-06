@@ -138,8 +138,8 @@ const challenges = [
 ];
 
 const schoolsLeaderboard = [
-    { name: "Kendriya Vidyalaya", co2Reduced: 2500, students: 1200 },
-    { name: "Delhi Public School", co2Reduced: 1800, students: 1500 },
+    { name: "Delhi Public School", co2Reduced: 4200, students: 3000 },
+    { name: "Kendriya Vidyalaya", co2Reduced: 2500, students: 1200 },    
     { name: "St. Xavier's School", co2Reduced: 1650, students: 1100 },
     { name: "Sanskriti School", co2Reduced: 1420, students: 900 },
     { name: "Modern School", co2Reduced: 1280, students: 1300 }
