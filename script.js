@@ -138,8 +138,8 @@ const challenges = [
 ];
 
 const schoolsLeaderboard = [
-    { name: "Delhi Public School", co2Reduced: 4200, students: 3000 },
-    { name: "Kendriya Vidyalaya", co2Reduced: 2500, students: 1200 },    
+    { name: "Kendriya Vidyalaya", co2Reduced: 2500, students: 1200 },
+    { name: "Delhi Public School", co2Reduced: 1800, students: 1500 },
     { name: "St. Xavier's School", co2Reduced: 1650, students: 1100 },
     { name: "Sanskriti School", co2Reduced: 1420, students: 900 },
     { name: "Modern School", co2Reduced: 1280, students: 1300 }
@@ -184,6 +184,7 @@ let currentTab = 'calculator';
 document.addEventListener('DOMContentLoaded', function() {
     loadHistoryFromStorage();
     initializeAdvancedFeatures();
+    registerServiceWorker();
     
     // Add animation delay to input groups
     const inputGroups = document.querySelectorAll('.input-group');
@@ -220,51 +221,120 @@ function saveHistoryToStorage() {
     localStorage.setItem('carbonHistory', JSON.stringify(carbonHistory));
     localStorage.setItem('userAchievements', JSON.stringify(userAchievements));
 }
+function updateHistoryStats() {
+    // Update history stats in the history section
+    if (carbonHistory.length > 0) {
+        // Calculate total calculations
+        const totalCalculations = carbonHistory.length;
+        document.getElementById('total-calculations').textContent = totalCalculations;
+        
+        // Calculate average footprint
+        const totalFootprint = carbonHistory.reduce((sum, entry) => sum + entry.totalCarbon, 0);
+        const averageFootprint = totalFootprint / totalCalculations;
+        document.getElementById('average-footprint').textContent = `${averageFootprint.toFixed(1)} kg`;
+        
+        // Find best footprint
+        const bestFootprint = Math.min(...carbonHistory.map(entry => entry.totalCarbon));
+        document.getElementById('best-footprint').textContent = `${bestFootprint.toFixed(1)} kg`;
+    } else {
+        // Set default values when no history
+        document.getElementById('total-calculations').textContent = '0';
+        document.getElementById('average-footprint').textContent = '0 kg';
+        document.getElementById('best-footprint').textContent = '0 kg';
+    }
+}
 
+// Trend analysis function removed
+
+function compareWithHistory(index) {
+    const historyEntry = carbonHistory[index];
+    const timestamp = historyEntry.timestamp || historyEntry.datetime;
+    const date = new Date(timestamp);
+    
+    alert(`Comparing with your calculation from ${date.toLocaleDateString()}:\n\n` +
+          `Carbon Footprint: ${historyEntry.totalCarbon} kg CO₂\n` +
+          `Lifestyle: ${historyEntry.state}, ${historyEntry.vehicleType}, ${historyEntry.foodType}\n\n` +
+          `This feature would show a detailed comparison chart in the full version.`);
+}
+
+function deleteHistoryItem(index) {
+    if (confirm('Are you sure you want to delete this history entry?')) {
+        carbonHistory.splice(index, 1);
+        saveHistoryToStorage();
+        updateHistoryDisplay();
+    }
+}
 function updateHistoryDisplay() {
     const historyList = document.getElementById('history-list');
-    const totalCalculations = document.getElementById('total-calculations');
-    const averageFootprint = document.getElementById('average-footprint');
-    const bestFootprint = document.getElementById('best-footprint');
     
     if (!historyList) return;
     
-    // Update stats
-    if (totalCalculations) {
-        totalCalculations.textContent = carbonHistory.length;
-    }
-    
-    if (averageFootprint && carbonHistory.length > 0) {
-        const avg = carbonHistory.reduce((sum, entry) => sum + entry.totalCarbon, 0) / carbonHistory.length;
-        averageFootprint.textContent = Math.round(avg) + ' kg';
-    }
-    
-    if (bestFootprint && carbonHistory.length > 0) {
-        const best = Math.min(...carbonHistory.map(entry => entry.totalCarbon));
-        bestFootprint.textContent = Math.round(best) + ' kg';
-    }
-    
-    // Update history list
-    historyList.innerHTML = '';
+    // Update history stats
+    updateHistoryStats();
     
     if (carbonHistory.length === 0) {
-        historyList.innerHTML = '<div class="no-history">No calculations yet. Use the calculator to get started!</div>';
+        historyList.innerHTML = `
+            <div class="history-empty">
+                <div class="history-empty-icon">📊</div>
+                <div class="history-empty-text">No tracking history yet</div>
+                <div class="history-empty-subtext">Calculate your footprint to start tracking your progress!</div>
+            </div>
+        `;
         return;
     }
-    
-    carbonHistory.forEach((entry, index) => {
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        historyItem.innerHTML = `
-            <div class="history-date">${entry.date}</div>
-            <div class="history-carbon">${Math.round(entry.totalCarbon)} kg CO₂</div>
-            <div class="history-details">
-                <span>${entry.state} • ${entry.vehicleType} • ${entry.foodType}</span>
+
+    const historyHTML = carbonHistory.map((entry, index) => {
+        // Handle both old and new timestamp formats
+        const timestamp = entry.timestamp || entry.datetime;
+        const date = new Date(timestamp);
+        const dateString = date.toLocaleDateString('en-IN');
+        const timeString = date.toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        });
+        
+        // Format lifestyle tags with icons
+        const lifestyleTags = `
+            <div class="lifestyle-tag">
+                <span class="lifestyle-icon">🏠</span>
+                ${entry.state.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
             </div>
-            <button class="history-delete" onclick="deleteHistoryEntry(${index})">🗑️</button>
+            <div class="lifestyle-tag">
+                <span class="lifestyle-icon">🚗</span>
+                ${entry.vehicleType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            </div>
+            <div class="lifestyle-tag">
+                <span class="lifestyle-icon">🍽️</span>
+                ${entry.foodType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+            </div>
         `;
-        historyList.appendChild(historyItem);
-    });
+        
+        return `
+            <div class="history-item" style="animation-delay: ${index * 0.1}s;">
+                <div class="history-date">
+                    <div class="history-date-main">${dateString}</div>
+                    <div class="history-date-time">${timeString}</div>
+                </div>
+                <div class="history-details">
+                    <div class="history-carbon">
+                        <span class="history-carbon-value">${entry.totalCarbon.toLocaleString()}</span>
+                        <span class="history-carbon-unit">kg CO₂</span>
+                    </div>
+                    <div class="history-lifestyle">
+                        ${lifestyleTags}
+                    </div>
+                </div>
+                <div class="history-actions">
+                    <button class="history-delete-btn" onclick="deleteHistoryItem(${index})">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    historyList.innerHTML = historyHTML;
 }
 
 function deleteHistoryEntry(index) {
@@ -1060,27 +1130,419 @@ function shareResults() {
         return;
     }
 
+    const studentName = document.getElementById('student-name')?.value?.trim() || 'Student';
     const treesNeeded = Math.ceil(totalCarbon / 21);
-    const shareText = `🌍 My carbon footprint is ${Math.round(totalCarbon)} kg CO₂/year. I need to plant ${treesNeeded} trees to offset it. Calculate yours with EcoMitra Pro! #ClimateAction #CarbonFootprint`;
+    const category = getCarbonCategory(totalCarbon);
     
-    if (navigator.share) {
-        navigator.share({
-            title: 'My Carbon Footprint Results',
-            text: shareText,
-            url: window.location.href
+    // Create a shareable image
+    createShareableImage(studentName, totalCarbon, treesNeeded, category);
+}
+
+function createShareableImage(name, carbon, trees, category) {
+    // Create a canvas for the shareable image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size for social media (1200x630 is optimal for most platforms)
+    canvas.width = 1200;
+    canvas.height = 630;
+    
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#2E8B57');
+    gradient.addColorStop(1, '#32CD32');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add white content area
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+    ctx.fillRect(50, 50, canvas.width - 100, canvas.height - 100);
+    
+    // Add border
+    ctx.strokeStyle = '#32CD32';
+    ctx.lineWidth = 8;
+    ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+    
+    // Set text properties
+    ctx.fillStyle = '#2E8B57';
+    ctx.textAlign = 'center';
+    
+    // Title
+    ctx.font = 'bold 48px Arial';
+    ctx.fillText('🌍 My Carbon Footprint Results', canvas.width / 2, 150);
+    
+    // Student name
+    ctx.font = 'bold 36px Arial';
+    ctx.fillText(name, canvas.width / 2, 220);
+    
+    // Carbon footprint
+    ctx.font = 'bold 72px Arial';
+    ctx.fillStyle = '#667eea';
+    ctx.fillText(`${Math.round(carbon)} kg CO₂/year`, canvas.width / 2, 320);
+    
+    // Details
+    ctx.font = '28px Arial';
+    ctx.fillStyle = '#333';
+    ctx.fillText(`🌳 Trees needed to offset: ${trees} trees`, canvas.width / 2, 380);
+    ctx.fillText(`📊 Category: ${category}`, canvas.width / 2, 420);
+    
+    // Footer
+    ctx.font = '24px Arial';
+    ctx.fillStyle = '#666';
+    ctx.fillText('Calculate yours with EcoMitra Pro!', canvas.width / 2, 500);
+    ctx.fillText('CBSE Science Exhibition 2025', canvas.width / 2, 540);
+    
+    // Convert canvas to blob and share
+    canvas.toBlob(function(blob) {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], 'carbon-footprint.png', { type: 'image/png' })] })) {
+            const file = new File([blob], 'carbon-footprint.png', { type: 'image/png' });
+            navigator.share({
+                title: 'My Carbon Footprint Results',
+                text: `🌍 My carbon footprint is ${Math.round(carbon)} kg CO₂/year. Calculate yours with EcoMitra Pro! #ClimateAction #CBSE2025`,
+                files: [file]
+            }).catch(() => {
+                // Fallback to download
+                downloadImage(canvas);
+            });
+        } else {
+            // Fallback to download
+            downloadImage(canvas);
+        }
+    }, 'image/png');
+}
+
+function downloadImage(canvas) {
+    const link = document.createElement('a');
+    link.download = 'my-carbon-footprint.png';
+    link.href = canvas.toDataURL();
+    link.click();
+    
+    // Also copy text to clipboard
+    const totalCarbon = parseFloat(document.getElementById('total-carbon')?.textContent) || 0;
+    const treesNeeded = Math.ceil(totalCarbon / 21);
+    const shareText = `🌍 My carbon footprint is ${Math.round(totalCarbon)} kg CO₂/year. I need to plant ${treesNeeded} trees to offset it. Calculate yours with EcoMitra Pro! #ClimateAction #CarbonFootprint #CBSE2025`;
+    
+    navigator.clipboard.writeText(shareText).then(() => {
+        alert('📱 Image downloaded and text copied to clipboard! Share both with your friends and school.');
+    });
+}
+
+function generateCertificate() {
+    const totalCarbon = parseFloat(document.getElementById('total-carbon')?.textContent) || 0;
+    if (totalCarbon === 0) {
+        alert('Please calculate your carbon footprint first to generate your certificate!');
+        return;
+    }
+    
+    const studentName = document.getElementById('student-name')?.value?.trim() || 'Student';
+    const treesNeeded = Math.ceil(totalCarbon / 21);
+    const currentDate = new Date().toLocaleString('en-IN', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric', 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        hour12: true 
+    }); // Current date and time: 07 October 2025, 02:10 PM IST
+
+    const certificateHTML = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Carbon Footprint Certificate - EcoMitra Pro</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <style>
+                @page {
+                    size: A4 landscape;
+                    margin: 0;
+                }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: 'Georgia', serif;
+                    width: 297mm;
+                    height: 210mm;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: white;
+                    padding: 0;
+                }
+                .certificate {
+                    width: 297mm;
+                    height: 210mm;
+                    position: relative;
+                    border: 4px solid #32CD32;
+                    border-radius: 5mm;
+                    padding: 10mm;
+                    background: linear-gradient(to right, #f0f8f0, #ffffff);
+                    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 8mm;
+                }
+                .badge {
+                    font-size: 3.5rem;
+                    color: #32CD32;
+                    margin-bottom: 4mm;
+                }
+                .title {
+                    font-size: 2.2rem;
+                    color: #2E8B57;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                    margin-bottom: 2mm;
+                }
+                .subtitle {
+                    font-size: 1rem;
+                    color: #4a4a4a;
+                    margin-bottom: 3mm;
+                }
+                .school-highlight {
+                    font-size: 1.2rem;
+                    color: #FFD700;
+                    font-weight: bold;
+                    background: #2E8B57;
+                    padding: 2mm 4mm;
+                    border-radius: 3mm;
+                    display: inline-block;
+                }
+                .content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 10mm;
+                    padding: 0 5mm;
+                }
+                .left-section, .right-section {
+                    flex: 1;
+                    text-align: center;
+                }
+                .student-name {
+                    font-size: 1.6rem;
+                    color: #2E8B57;
+                    font-style: italic;
+                    margin: 5mm 0;
+                    border-bottom: 2px dashed #32CD32;
+                    padding-bottom: 2mm;
+                    display: inline-block;
+                }
+                .results-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 5mm;
+                    max-width: 100%;
+                }
+                .result-item {
+                    background: #e8f5e8;
+                    padding: 5mm;
+                    border-radius: 3mm;
+                    border: 1px solid #32CD32;
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+                }
+                .result-label {
+                    font-weight: bold;
+                    color: #2E8B57;
+                    margin-bottom: 2mm;
+                }
+                .result-value {
+                    font-size: 1.3rem;
+                    color: #667eea;
+                    font-weight: bold;
+                }
+                .description {
+                    font-size: 0.9rem;
+                    color: #555;
+                    line-height: 1.5;
+                    text-align: justify;
+                    max-width: 90%;
+                    margin: 0 auto 5mm;
+                }
+                .seal {
+                    position: absolute;
+                    bottom: 15mm;
+                    right: 15mm;
+                    width: 25mm;
+                    height: 25mm;
+                    border-radius: 50%;
+                    background: radial-gradient(circle, rgba(50, 205, 50, 0.3) 0%, transparent 70%);
+                    opacity: 0.5;
+                }
+                .footer {
+                    text-align: center;
+                    color: #666;
+                    font-size: 0.8rem;
+                    margin-top: 5mm;
+                }
+                .date {
+                    margin-bottom: 2mm;
+                }
+                .motto {
+                    font-style: italic;
+                    color: #32CD32;
+                    margin-top: 2mm;
+                }
+                @media print {
+                    body { padding: 0; margin: 0; }
+                    .certificate { border: none; box-shadow: none; border-radius: 0; }
+                    .no-print { display: none; }
+                }
+                @media screen and (max-width: 768px) {
+                    .certificate { 
+                        width: 100%;
+                        height: auto;
+                        min-height: 210mm;
+                        padding: 8mm;
+                        flex-direction: column;
+                    }
+                    .content { flex-direction: column; gap: 5mm; }
+                    .left-section, .right-section { width: 100%; }
+                    .title { font-size: 1.8rem; }
+                    .student-name { font-size: 1.4rem; }
+                    .result-value { font-size: 1.2rem; }
+                    .description { font-size: 0.85rem; }
+                    .seal { bottom: 10mm; right: 10mm; width: 20mm; height: 20mm; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="certificate">
+                <div class="header">
+                    <div class="badge">🏆</div>
+                    <div class="title">Certificate of Environmental Excellence</div>
+                    <div class="subtitle">CBSE Science Exhibition 2025</div>
+                    <div class="subtitle">Developed by <span class="school-highlight">Delhi Public School</span></div>
+                    <div class="subtitle">Powered by EcoMitra Pro - xAI Advanced Carbon Intelligence</div>
+                </div>
+                
+                <div class="content">
+                    <div class="left-section">
+                        <p class="description">This certificate is proudly awarded to</p>
+                        <div class="student-name">${studentName}</div>
+                        
+                        <p class="description">for their outstanding contribution to environmental awareness by completing a comprehensive Carbon Footprint Analysis as part of the CBSE Science Exhibition 2025. This initiative, developed by <span class="school-highlight">Delhi Public School</span>, aligns with India's commitment to the Paris Agreement and the goal of achieving net-zero emissions by 2070.</p>
+                    </div>
+                    <div class="right-section">
+                        <div class="results-grid">
+                            <div class="result-item">
+                                <div class="result-label">Annual Carbon Footprint</div>
+                                <div class="result-value">${Math.round(totalCarbon)} kg CO₂</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Trees Needed to Offset</div>
+                                <div class="result-value">${treesNeeded}</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Performance Category</div>
+                                <div class="result-value">${getCarbonCategory(totalCarbon)}</div>
+                            </div>
+                            <div class="result-item">
+                                <div class="result-label">Climate Impact Score</div>
+                                <div class="result-value">${calculateImpactScore(totalCarbon)}%</div>
+                            </div>
+                        </div>
+                        
+                        <p class="description">This assessment, based on IPCC AR6 methodologies and Indian-specific emission factors, evaluates lifestyle impacts across electricity, transport, food, waste, and more. The student has received personalized action plans to reduce their carbon footprint and contribute to a sustainable future.</p>
+                    </div>
+                </div>
+                
+                <div class="seal"></div>
+                
+                <div class="footer">
+                    <p class="date">Issued on: ${currentDate} IST</p>
+                    <p>Certified by <span class="school-highlight">Delhi Public School</span> in collaboration with EcoMitra Pro</p>
+                    <p class="motto">🌱 "Together for a Greener India" 🇮🇳</p>
+                </div>
+            </div>
+            
+            <div class="no-print" style="text-align: center; margin-top: 20px;">
+                <button onclick="window.print()" style="padding: 12px 25px; font-size: 1rem; background: #32CD32; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
+                    🖨️ Print Certificate
+                </button>
+                <button onclick="downloadAsPDF()" style="padding: 12px 25px; font-size: 1rem; background: #FF6B6B; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
+                    📄 Download PDF
+                </button>
+                <button onclick="window.close()" style="padding: 12px 25px; font-size: 1rem; background: #666; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
+                    ❌ Close
+                </button>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    // Open in new window
+    const printWindow = window.open('', '_blank', 'width=1000,height=700'); // Adjusted for landscape preview
+    printWindow.document.write(certificateHTML);
+    printWindow.document.close();
+
+    // Ensure jsPDF is loaded before attempting download
+    setTimeout(() => {
+        downloadAsPDF();
+    }, 500); // Delay to allow HTML rendering
+}
+
+// Ensure these functions are defined in script.js
+function calculateImpactScore(totalCarbon) {
+    const indianAverage = 1910;
+    return Math.max(0, Math.min(100, Math.round(100 - (totalCarbon / indianAverage * 50))));
+}
+
+function getCarbonCategory(totalCarbon) {
+    if (totalCarbon <= 1500) return '🟢 Excellent - Climate Champion';
+    if (totalCarbon <= 2500) return '🟡 Good - Below Average';
+    if (totalCarbon <= 4000) return '🟠 Average - Room for Improvement';
+    if (totalCarbon <= 6000) return '🔴 High - Action Needed';
+    return '🔴 Very High - Urgent Action Required';
+}
+
+function downloadAsPDF() {
+    if (typeof window.jspdf === 'undefined') {
+        alert('PDF download failed. Please ensure an internet connection to load the jsPDF library.');
+        return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l', 'mm', 'a4'); // 'l' for landscape
+    
+    const element = printWindow.document.querySelector('.certificate');
+    if (element) {
+        doc.html(element, {
+            callback: function (doc) {
+                doc.save(`carbon-footprint-certificate-${studentName}-${currentDate.replace(/[:/]/g, '-')}.pdf`);
+            },
+            x: 0,
+            y: 0,
+            width: 297, // A4 landscape width
+            windowWidth: element.scrollWidth
         });
     } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(shareText).then(() => {
-            alert('📋 Results copied to clipboard! Share it with your friends.');
-        });
+        alert('PDF generation failed. Please try again or use the print option.');
     }
 }
 
+function getCarbonCategory(totalCarbon) {
+    if (totalCarbon <= 1500) return '🟢 Excellent - Climate Champion';
+    if (totalCarbon <= 2500) return '🟡 Good - Below Average';
+    if (totalCarbon <= 4000) return '🟠 Average - Room for Improvement';
+    if (totalCarbon <= 6000) return '🔴 High - Action Needed';
+    return '🔴 Very High - Urgent Action Required';
+}
+
 function saveToHistory(totalCarbon, inputs) {
+    const now = new Date();
     const entry = {
-        date: new Date().toLocaleDateString('en-IN'),
-        timestamp: Date.now(),
+        timestamp: now.toISOString(), // Store ISO timestamp for consistency
+        datetime: now.toLocaleString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+        }),
         totalCarbon: Math.round(totalCarbon),
         state: inputs.state,
         vehicleType: inputs.vehicleType,
@@ -1176,6 +1638,19 @@ document.addEventListener('keydown', function(event) {
         closeExportModal();
     }
 });
+
+// Service Worker Registration for PWA
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => {
+                console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+                console.log('SW registration failed: ', registrationError);
+            });
+    }
+}
 
 // Auto-save functionality
 let autoSaveTimer;
