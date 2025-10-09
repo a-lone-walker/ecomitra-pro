@@ -2,18 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EcoMitra Pro - Advanced Carbon Intelligence Platform</title>
-    <meta name="description" content="CBSE Science Exhibition 2025 - Advanced Carbon Footprint Calculator for Sustainable India">
-    <meta name="theme-color" content="#32CD32">
     <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <div class="exhibition-badge">🏆 CBSE Science Exhibition 2025</div>
             <h1>🌍 EcoMitra Pro - Advanced Carbon Intelligence Platform</h1>
             <p>AI-Powered Carbon Footprint Analysis & Climate Action Platform for Sustainable India 🇮🇳</p>
             <div class="live-data-banner">
@@ -37,27 +32,6 @@
             <div class="main-content">
                 <div class="input-section">
                     <h2 class="section-title">📊 Advanced Carbon Footprint Assessment</h2>
-                    
-                    <!-- Student Name Input -->
-                    <div class="student-name-section">
-                        <div class="input-group">
-                            <label for="student-name">👤 Student Name (for certificate)</label>
-                            <input type="text" id="student-name" placeholder="Enter your full name" maxlength="50">
-                            <div class="input-tooltip">Your name will be used for generating the certificate</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Quick Calculator Info Box -->
-                    <div class="quick-info-box">
-                        <h4>⚡ Quick Start Guide</h4>
-                        <p>Enter your monthly electricity usage and travel distance to get started. All other fields are optional for a more detailed analysis!</p>
-                    </div>
-                    
-                    <!-- Inspirational Quote -->
-                    <div class="quote-box">
-                        <div class="quote-text">"The Earth does not belong to us; we belong to the Earth. All things are connected like the blood that unites one family."</div>
-                        <div class="quote-author">- Chief Seattle</div>
-                    </div>
                     
                     <div class="input-grid">
                         <div class="input-group">
@@ -243,22 +217,11 @@
                             <div class="comparison-text" id="comparison-text"></div>
                         </div>
 
-                <div class="trees-needed">
-                    <h3>🌳 Carbon Offset Requirements</h3>
-                    <div class="tree-count" id="trees-count">0</div>
-                    <p>trees needed to offset annually</p>
-                    <button class="share-result-btn" onclick="shareResults()">
-                        📱 Share My Results
-                    </button>
-                </div>
-                
-                <!-- Motivational Quote -->
-                <div class="motivation-quote">
-                    <div class="quote-content">
-                        <div class="quote-text">"The best time to plant a tree was 20 years ago. The second best time is now."</div>
-                        <div class="quote-author">- Chinese Proverb</div>
-                    </div>
-                </div>
+                        <div class="trees-needed">
+                            <h3>🌳 Carbon Offset Requirements</h3>
+                            <div class="tree-count" id="trees-count">0</div>
+                            <p>trees needed to offset annually</p>
+                        </div>
 
                         <!-- Progress and Carbon Level -->
                         <div class="progress-container">
@@ -344,42 +307,6 @@
                                 <li>Loading personalized recommendations...</li>
                             </ul>
                         </div>
-                        
-                        <!-- Download Certificate Section -->
-                <div class="certificate-section">
-                    <h3>🏆 Get Your Green Certificate</h3>
-                    <p>Download your personalized carbon footprint analysis certificate to share with your school!</p>
-                    <button class="certificate-btn" onclick="generateCertificate()">
-                        📜 Generate Certificate
-                    </button>
-                </div>
-                
-                <!-- Why Use This Platform -->
-                <div class="platform-benefits">
-                    <h3>🌟 Why Choose EcoMitra Pro?</h3>
-                    <div class="benefits-grid">
-                        <div class="benefit-item">
-                            <div class="benefit-icon">🎯</div>
-                            <h4>Accurate Calculations</h4>
-                            <p>Based on scientific emission factors and Indian context data</p>
-                        </div>
-                        <div class="benefit-item">
-                            <div class="benefit-icon">📱</div>
-                            <h4>Mobile Optimized</h4>
-                            <p>Perfect experience on all devices, especially mobile phones</p>
-                        </div>
-                        <div class="benefit-item">
-                            <div class="benefit-icon">🏫</div>
-                            <h4>School Integration</h4>
-                            <p>Designed for CBSE Science Exhibition 2025 and school use</p>
-                        </div>
-                        <div class="benefit-item">
-                            <div class="benefit-icon">🌱</div>
-                            <h4>Action-Oriented</h4>
-                            <p>Get personalized tips and action plans to reduce your footprint</p>
-                        </div>
-                    </div>
-                </div>
                     </div>
                 </div>
             </div>
@@ -387,45 +314,50 @@
 
         <!-- History Tab -->
         <div id="history" class="tab-content">
-            <div style="margin-top: 20px;">
-                <h2 class="section-title">📈 Your Carbon Footprint History</h2>
-            </div>
-            
-            <div class="history-container">
-                <div class="history-stats">
-                    <div class="history-stat">
-                        <h3>Total Calculations</h3>
-                        <div class="stat-value" id="total-calculations">0</div>
+            <div class="main-content">
+                <div style="padding: 40px; width: 100%;">
+                    <h2 class="section-title">📈 Your Carbon Footprint History</h2>
+                    
+                    <div class="history-container">
+                        <div class="history-stats">
+                            <div class="history-stat">
+                                <h3>Total Calculations</h3>
+                                <div class="stat-value" id="total-calculations">0</div>
+                            </div>
+                            <div class="history-stat">
+                                <h3>Average Footprint</h3>
+                                <div class="stat-value" id="average-footprint">0 kg</div>
+                            </div>
+                            <div class="history-stat">
+                                <h3>Best Footprint</h3>
+                                <div class="stat-value" id="best-footprint">0 kg</div>
+                            </div>
+                        </div>
+                        
+                        <div class="history-chart-container">
+                            <canvas id="history-chart"></canvas>
+                        </div>
+                        
+                        <div class="history-list" id="history-list">
+                            <!-- History entries will be loaded here -->
+                        </div>
+                        
+                        <div class="history-actions">
+                            <button onclick="clearHistory()" class="history-btn">🗑️ Clear History</button>
+                            <button onclick="exportHistory()" class="history-btn">📤 Export History</button>
+                        </div>
                     </div>
-                    <div class="history-stat">
-                        <h3>Average Footprint</h3>
-                        <div class="stat-value" id="average-footprint">0 kg</div>
-                    </div>
-                    <div class="history-stat">
-                        <h3>Best Footprint</h3>
-                        <div class="stat-value" id="best-footprint">0 kg</div>
-                    </div>
-                </div>
-                
-                <div class="history-list" id="history-list">
-                </div>
-                
-                <div class="history-actions">
-                    <button onclick="clearHistory()" class="history-btn">🗑️ Clear History</button>
-                    <button onclick="exportHistory()" class="history-btn">📤 Export History</button>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-
+        <!-- Live Impact Tab -->
         <div id="impact" class="tab-content">
             <div class="main-content">
-                <div style="padding: 40px; width: 100%; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div style="padding: 40px; width: 100%;">
                     <h2 class="section-title">📊 Live Environmental Impact</h2>
                     
-
+                    <!-- Climate News Feed -->
                     <div class="news-feed">
                         <h3>🌍 Latest Climate News</h3>
                         <div class="news-container" id="news-container">
@@ -449,6 +381,7 @@
                         <h3>🌍 Live Carbon Atmosphere Simulation</h3>
                         <div class="visualization-container">
                             <div id="carbon-particle-system">
+                                <!-- Particles will be generated by JavaScript -->
                             </div>
                             <div class="visualization-info">
                                 <p>Each particle represents <strong>100 kg of CO₂</strong> in the atmosphere</p>
@@ -457,7 +390,7 @@
                         </div>
                     </div>
 
-
+                    <!-- Live Data Dashboard -->
                     <div class="live-dashboard">
                         <div class="dashboard-grid">
                             <div class="dashboard-item">
@@ -482,9 +415,9 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="chart-container">
                         <h3>📈 Indian Carbon Context</h3>
-                        <div class="breakdown-container">
                         <div class="breakdown">
                             <div class="breakdown-item">
                                 <h4>🏭 India's Total Emissions</h4>
@@ -507,7 +440,6 @@
                                 <div class="breakdown-percentage">CO₂ per person/year</div>
                             </div>
                         </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -516,7 +448,7 @@
         <!-- Challenges Tab -->
         <div id="challenges" class="tab-content">
             <div class="main-content">
-                <div style="padding: 40px; width: 100%; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div style="padding: 40px; width: 100%;">
                     <h2 class="section-title">🏆 Climate Action Challenges</h2>
                     
                     <div class="challenge-intro">
@@ -552,7 +484,7 @@
         <!-- Community Tab -->
         <div id="community" class="tab-content">
             <div class="main-content">
-                <div style="padding: 40px; width: 100%; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div style="padding: 40px; width: 100%;">
                     <h2 class="section-title">👥 Community Impact Dashboard</h2>
                     
                     <div class="community-impact">
@@ -611,7 +543,7 @@
         <!-- Methodology Tab -->
         <div id="methodology" class="tab-content">
             <div class="main-content">
-                <div style="padding: 40px; width: 100%; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                <div style="padding: 40px; width: 100%;">
                     <h2 class="section-title">🔬 Scientific Methodology & Validation</h2>
                     
                     <div class="scientific-validation">
