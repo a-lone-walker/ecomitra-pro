@@ -180,6 +180,10 @@ let userAchievements = [];
 // Current active tab
 let currentTab = 'calculator';
 
+// Add these variables at the top
+let userCoords = null;
+let userAreaName = 'Your Location';
+
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
     loadHistoryFromStorage();
@@ -192,6 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
         group.style.animationDelay = (index * 0.1) + 's';
     });
 
+    const detectBtn = document.getElementById('detect-location-btn');
+    if (detectBtn) {
+        detectBtn.addEventListener('click', getUserLocationAndUpdateLiveData);
+    }
+
     // Initialize slider
     updateSliderValue('green-energy', 'green-energy-value');
 
@@ -203,7 +212,36 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSchoolLeaderboard();
     loadClimateNews();
     updateHistoryDisplay();
+
+    getUserLocationAndUpdateLiveData();
 });
+
+// function getUserLocationAndUpdateLiveData() {
+//     document.getElementById('live-time').textContent = '📍 Detecting...';
+//     if (navigator.geolocation) {
+//         navigator.geolocation.getCurrentPosition(
+//             async (position) => {
+//                 userCoords = {
+//                     lat: position.coords.latitude,
+//                     lon: position.coords.longitude
+//                 };
+//                 userAreaName = await getAreaNameFromCoords(userCoords.lat, userCoords.lon);
+//                 document.getElementById('live-time').textContent = `📍 ${userAreaName}`;
+//                 updateLiveAQI(userCoords.lat, userCoords.lon, userAreaName);
+//                 updateLiveCO2(userCoords.lat, userCoords.lon);
+//             },
+//             (error) => {
+//                 document.getElementById('live-time').textContent = '🕒 Location unavailable';
+//                 updateLiveAQI();
+//                 updateLiveCO2();
+//             }
+//         );
+//     } else {
+//         document.getElementById('live-time').textContent = '🕒 Geolocation not supported';
+//         updateLiveAQI();
+//         updateLiveCO2();
+//     }
+// }
 
 function loadHistoryFromStorage() {
     const storedHistory = localStorage.getItem('carbonHistory');
@@ -407,6 +445,8 @@ function switchTab(tabName) {
         updateChallengesProgress();
     } else if (tabName === 'history') {
         updateHistoryDisplay();
+    } else if (tabName === 'community') {
+        loadSchoolLeaderboard(); // <-- Add this line
     }
 }
 
@@ -856,55 +896,84 @@ function startLiveDataUpdates() {
     setInterval(loadClimateNews, 300000); // Update news every 5 minutes
 }
 
-async function updateLiveAQI() {
+// Replace this with your actual AQICN API token
+const AQICN_TOKEN = '282f20940452b3db86441f5b72be287b4cca5fff'; // <-- Replace with your real token
+
+async function updateLiveAQI(lat = 28.6139, lon = 77.2090, areaName = 'Delhi') {
     try {
-        // Using a demo API - in production, use real AQI API with proper token
-        const response = await fetch('https://api.waqi.info/feed/delhi/?token=demo');
+        const response = await fetch(`https://api.waqi.info/feed/geo:${lat};${lon}/?token=${AQICN_TOKEN}`);
         const data = await response.json();
-        
-        const aqiValue = data.data?.aqi || 156;
-        const aqiLevel = getAQILevel(aqiValue);
-        
-        document.getElementById('live-aqi').textContent = `🌬️ Live AQI: ${aqiValue} (${aqiLevel})`;
-        document.getElementById('live-aqi-value').textContent = aqiValue;
-        document.getElementById('aqi-level').textContent = aqiLevel;
-        
-    } catch (error) {
-        // Fallback to simulated data
-        const simulatedAQI = 120 + Math.floor(Math.random() * 80);
-        const aqiLevel = getAQILevel(simulatedAQI);
-        
-        document.getElementById('live-aqi').textContent = `🌬️ Live AQI: ${simulatedAQI} (${aqiLevel})`;
-        document.getElementById('live-aqi-value').textContent = simulatedAQI;
-        document.getElementById('aqi-level').textContent = aqiLevel;
+        if (data.status === 'ok' && data.data?.aqi) {
+            const aqiValue = data.data.aqi;
+            const aqiLevel = getAQILevel(aqiValue);
+            document.getElementById('live-aqi').textContent = `🌬️ AQI (${areaName}): ${aqiValue} (${aqiLevel})`;
+        } else {
+            // Fallback to Delhi average if API fails or no data
+            document.getElementById('live-aqi').textContent = `🌬️ AQI (Delhi): 156 (Moderate)`;
+        }
+    } catch {
+        // Fallback to Delhi average if network error
+        document.getElementById('live-aqi').textContent = `🌬️ AQI (Delhi): 156 (Moderate)`;
     }
 }
 
-function getAQILevel(aqi) {
-    if (aqi <= 50) return 'Good';
-    if (aqi <= 100) return 'Moderate';
-    if (aqi <= 150) return 'Unhealthy for Sensitive Groups';
-    if (aqi <= 200) return 'Unhealthy';
-    if (aqi <= 300) return 'Very Unhealthy';
-    return 'Hazardous';
+// Update CO2 (ppm) for given coordinates (placeholder, as no free API exists)
+async function updateLiveCO2(lat = 28.6139, lon = 77.2090) {
+    // For demo, use a static value or nearest station
+    // Optionally, fetch from https://gml.noaa.gov/ccgg/trends/data.html or similar
+    document.getElementById('live-co2').textContent = '🌡️ Atmospheric CO₂: 418 ppm';
 }
 
-// Climate News
-function loadClimateNews() {
-    const newsContainer = document.getElementById('news-container');
-    if (!newsContainer) return;
+// Get user location and update live data
+function getUserLocationAndUpdateLiveData() {
+    document.getElementById('live-time').textContent = '📍 Detecting...';
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                userCoords = {
+                    lat: position.coords.latitude,
+                    lon: position.coords.longitude
+                };
+                userAreaName = await getAreaNameFromCoords(userCoords.lat, userCoords.lon);
+                document.getElementById('live-time').textContent = `📍 ${userAreaName}`;
+                updateLiveAQI(userCoords.lat, userCoords.lon, userAreaName);
+                updateLiveCO2(userCoords.lat, userCoords.lon);
+            },
+            (error) => {
+                document.getElementById('live-time').textContent = '🕒 Location unavailable';
+                updateLiveAQI();
+                updateLiveCO2();
+            }
+        );
+    } else {
+        document.getElementById('live-time').textContent = '🕒 Geolocation not supported';
+        updateLiveAQI();
+        updateLiveCO2();
+    }
+}
 
-    // Shuffle news for variety
-    const shuffledNews = [...climateNews].sort(() => 0.5 - Math.random()).slice(0, 3);
-    
-    const newsHTML = shuffledNews.map(news => `
-        <div class="news-item">
-            <div class="news-title">${news.title}</div>
-            <div class="news-source">${news.source} • ${news.date}</div>
-        </div>
-    `).join('');
-    
-    newsContainer.innerHTML = newsHTML;
+// Reverse geocode to get area name
+async function getAreaNameFromCoords(lat, lon) {
+    try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&format=json`);
+        const data = await res.json();
+        // Try to get the most specific name available
+        return (
+            // data.address.neighbourhood ||
+            // data.address.suburb ||
+            // data.address.village ||
+            data.address.town ||
+            data.address.city ||
+            data.address.hamlet ||
+            data.address.locality ||
+            data.address.state_district ||
+            data.address.state ||
+            data.display_name?.split(',')[0] ||
+            'Your Area'
+        );
+    } catch {
+        return 'Your Area';
+    }
 }
 
 // Carbon Visualization
@@ -1069,12 +1138,12 @@ function loadSchoolLeaderboard() {
     if (!leaderboard) return;
 
     const sortedSchools = [...schoolsLeaderboard].sort((a, b) => b.co2Reduced - a.co2Reduced);
-    
+
     const leaderboardHTML = sortedSchools.map((school, index) => `
         <div class="leaderboard-item">
             <span class="rank">#${index + 1}</span>
             <span class="school-name">${school.name}</span>
-            <span class="carbon-saved">-${school.co2Reduced} kg</span>
+            <span class="carbon-saved">${school.co2Reduced} kg</span>
         </div>
     `).join('');
 
@@ -1415,7 +1484,6 @@ function generateCertificate() {
                 <div class="header">
                     <div class="badge">🏆</div>
                     <div class="title">Certificate of Environmental Excellence</div>
-                    <div class="subtitle">CBSE Science Exhibition 2025</div>
                     <div class="subtitle">Developed by <span class="school-highlight">Delhi Public School</span></div>
                     <div class="subtitle">Powered by EcoMitra Pro - xAI Advanced Carbon Intelligence</div>
                 </div>
@@ -1425,7 +1493,7 @@ function generateCertificate() {
                         <p class="description">This certificate is proudly awarded to</p>
                         <div class="student-name">${studentName}</div>
                         
-                        <p class="description">for their outstanding contribution to environmental awareness by completing a comprehensive Carbon Footprint Analysis as part of the CBSE Science Exhibition 2025. This initiative, developed by <span class="school-highlight">Delhi Public School</span>, aligns with India's commitment to the Paris Agreement and the goal of achieving net-zero emissions by 2070.</p>
+                        <p class="description">for their outstanding contribution to environmental awareness by completing a comprehensive Carbon Footprint Analysis as a Responsible Sustainable Warrior. This initiative, developed by <span class="school-highlight">Delhi Public School</span>, aligns with India's commitment to the Paris Agreement and the goal of achieving net-zero emissions by 2070.</p>
                     </div>
                     <div class="right-section">
                         <div class="results-grid">
@@ -1464,9 +1532,7 @@ function generateCertificate() {
                 <button onclick="window.print()" style="padding: 12px 25px; font-size: 1rem; background: #32CD32; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
                     🖨️ Print Certificate
                 </button>
-                <button onclick="downloadAsPDF()" style="padding: 12px 25px; font-size: 1rem; background: #FF6B6B; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
-                    📄 Download PDF
-                </button>
+                
                 <button onclick="window.close()" style="padding: 12px 25px; font-size: 1rem; background: #666; color: white; border: none; border-radius: 25px; cursor: pointer; margin: 5px;">
                     ❌ Close
                 </button>
@@ -1664,4 +1730,50 @@ document.addEventListener('input', function() {
             // Auto calculation could be enabled here
         }
     }, 2000);
+});
+
+// Green Energy Functions
+function toggleGreenEnergyInputs() {
+    const source = document.getElementById('green-energy-source').value;
+    document.getElementById('green-energy-solar-fields').style.display = source === 'solar' ? 'block' : 'none';
+    document.getElementById('green-energy-wind-fields').style.display = source === 'wind' ? 'block' : 'none';
+    document.getElementById('green-energy-percentage-group').style.display = source === 'none' ? 'block' : 'block'; // Always show for manual override
+
+    if (source === 'solar') {
+        calculateSolarGeneration();
+    }
+}
+
+function calculateSolarGeneration() {
+    const panelCount = parseInt(document.getElementById('solar-panel-count').value) || 1;
+    const panelSize = parseInt(document.getElementById('solar-panel-size').value) || 250;
+    const sunHours = parseFloat(document.getElementById('solar-sun-hours').value) || 5;
+
+    // kWh per month = panelCount * panelSize(W) * sunHours * 30 / 1000
+    const monthlyKwh = panelCount * panelSize * sunHours * 30 / 1000;
+    document.getElementById('solar-monthly-kwh').value = monthlyKwh.toFixed(1) + ' kWh';
+
+    // If user has entered their total electricity usage, auto-calculate green percentage
+    const totalKwh = parseFloat(document.getElementById('electricity').value) || 0;
+    let greenPercent = 0;
+    if (totalKwh > 0) {
+        greenPercent = Math.min(100, Math.round((monthlyKwh / totalKwh) * 100));
+        document.getElementById('green-energy').value = greenPercent;
+        document.getElementById('green-energy-value').textContent = greenPercent;
+    }
+}
+
+// Attach event listeners for solar calculation
+document.addEventListener('DOMContentLoaded', function() {
+    const solarInputs = ['solar-panel-count', 'solar-panel-size', 'solar-sun-hours', 'electricity'];
+    solarInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateSolarGeneration);
+        }
+    });
+    const greenSource = document.getElementById('green-energy-source');
+    if (greenSource) {
+        greenSource.addEventListener('change', toggleGreenEnergyInputs);
+    }
 });
